@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -116,179 +119,141 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Criar Conta
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Ou{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              faça login na sua conta
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Tipo de Conta
-              </label>
-              <select
-                value={formData.tipo}
-                onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+    <div className="min-h-screen flex items-center justify-center bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl w-full">
+        <Card>
+          <Card.Header className="text-center">
+            <Card.Title className="text-3xl">Criar Conta</Card.Title>
+            <Card.Description className="mt-2">
+              Ou{' '}
+              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-700">
+                faça login na sua conta
+              </Link>
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="bg-danger-50 border border-danger-200 text-danger-700 px-4 py-3 rounded-lg text-sm" role="alert">
+                  {error}
+                </div>
+              )}
+              
+              <div className="space-y-4">
+                <Input.Select
+                  label="Tipo de Conta"
+                  value={formData.tipo}
+                  onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                  required
+                >
+                  <option value="empresa">Empresa</option>
+                  <option value="fornecedor">Fornecedor</option>
+                </Input.Select>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input
+                    label="Nome"
+                    type="text"
+                    required
+                    value={formData.nome}
+                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                  />
+
+                  <Input
+                    label="Email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="seu@email.com"
+                  />
+                </div>
+
+                <Input
+                  label="Password"
+                  type="password"
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  placeholder="••••••••"
+                />
+
+                {formData.tipo === 'empresa' && (
+                  <div className="space-y-4 pt-4 border-t border-secondary-200">
+                    <h3 className="text-lg font-semibold text-secondary-900">Informações da Empresa</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Input
+                        label="Setor"
+                        type="text"
+                        value={formData.setor}
+                        onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
+                        placeholder="ex: Tecnologia"
+                      />
+                      <Input
+                        label="Nº Funcionários"
+                        type="number"
+                        min="1"
+                        value={formData.n_funcionarios}
+                        onChange={(e) => setFormData({ ...formData, n_funcionarios: e.target.value })}
+                      />
+                      <Input
+                        label="Localização"
+                        type="text"
+                        value={formData.localizacao}
+                        onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
+                        placeholder="ex: Lisboa"
+                      />
+                      <Input
+                        label="Orçamento Médio (€)"
+                        type="number"
+                        step="0.01"
+                        value={formData.orcamento_medio}
+                        onChange={(e) => setFormData({ ...formData, orcamento_medio: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {formData.tipo === 'fornecedor' && (
+                  <div className="space-y-4 pt-4 border-t border-secondary-200">
+                    <h3 className="text-lg font-semibold text-secondary-900">Informações do Fornecedor</h3>
+                    <Input
+                      label="Localização"
+                      type="text"
+                      value={formData.localizacao}
+                      onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
+                      placeholder="ex: Lisboa"
+                    />
+                    <Input.Textarea
+                      label="Descrição"
+                      value={formData.descricao}
+                      onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                      rows="3"
+                      placeholder="Descreva os seus serviços..."
+                    />
+                    <Input
+                      label="Contacto"
+                      type="text"
+                      value={formData.contacto}
+                      onChange={(e) => setFormData({ ...formData, contacto: e.target.value })}
+                      placeholder="ex: +351 912 345 678"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={loading}
+                loading={loading}
+                className="w-full"
+                size="lg"
               >
-                <option value="empresa">Empresa</option>
-                <option value="fornecedor">Fornecedor</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nome
-              </label>
-              <input
-                type="text"
-                required
-                value={formData.nome}
-                onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                required
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                required
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            {formData.tipo === 'empresa' && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Setor
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.setor}
-                    onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nº Funcionários
-                  </label>
-                  <input
-                    type="number"
-                    value={formData.n_funcionarios}
-                    onChange={(e) => setFormData({ ...formData, n_funcionarios: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Localização
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.localizacao}
-                    onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Orçamento Médio (€)
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.orcamento_medio}
-                    onChange={(e) => setFormData({ ...formData, orcamento_medio: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </>
-            )}
-
-            {formData.tipo === 'fornecedor' && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Localização
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.localizacao}
-                    onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Descrição
-                  </label>
-                  <textarea
-                    value={formData.descricao}
-                    onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    rows="3"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contacto
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.contacto}
-                    onChange={(e) => setFormData({ ...formData, contacto: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {loading ? 'A registar...' : 'Criar Conta'}
-            </button>
-          </div>
-        </form>
+                Criar Conta
+              </Button>
+            </form>
+          </Card.Content>
+        </Card>
       </div>
     </div>
   );

@@ -1,18 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  body {
+    @apply bg-white-soft text-navy-900;
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Tipografia hierarquizada - TeamSync */
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-navy-900;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-navy-900;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-semibold text-navy-900;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h4 {
+    @apply text-xl md:text-2xl font-semibold text-navy-900;
+    font-family: 'Inter', sans-serif;
+  }
+
+  p {
+    @apply text-base md:text-lg text-navy-700 leading-relaxed;
+  }
+
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-grey-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-grey-300 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-grey-400;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  /* Utility classes for consistent spacing */
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+  
+  .section-spacing {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+
+  /* Text utilities */
+  .text-main {
+    @apply text-navy-900;
+  }
+
+  .text-muted {
+    @apply text-navy-700;
+  }
+
+  .text-subtle {
+    @apply text-navy-500;
+  }
+
+  /* Background utilities */
+  .bg-subtle {
+    @apply bg-white-soft;
+  }
 }
 

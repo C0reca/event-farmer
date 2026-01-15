@@ -5,6 +5,10 @@ import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import ActivityCard from '../components/ActivityCard';
 import ReservationForm from '../components/ReservationForm';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -102,81 +106,72 @@ function Dashboard() {
   };
 
   if (authLoading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
-
+    <AppLayout
+      title="Dashboard"
+      description="Encontre e reserve as melhores atividades de team building para sua empresa"
+    >
       {/* Formulário de Busca com Filtros Avançados */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-bold mb-4">Encontrar Atividades Recomendadas</h2>
-        <form onSubmit={handleSearch} className="space-y-4">
-          {/* Primeira linha - Filtros principais */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Nº Pessoas *
-              </label>
-              <input
+      <Card className="mb-8" hover={false}>
+        <Card.Header>
+          <Card.Title>Encontrar Atividades Recomendadas</Card.Title>
+          <Card.Description>
+            Utilize os filtros abaixo para encontrar atividades que se adequem às suas necessidades
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <form onSubmit={handleSearch} className="space-y-6">
+            {/* Primeira linha - Filtros principais */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <Input
+                label="Nº Pessoas"
                 type="number"
                 required
                 min="1"
                 value={formData.n_pessoas}
                 onChange={(e) => setFormData({ ...formData, n_pessoas: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Orçamento (€)
-              </label>
-              <input
+              <Input
+                label="Orçamento (€)"
                 type="number"
                 step="0.01"
                 value={formData.orcamento}
                 onChange={(e) => setFormData({ ...formData, orcamento: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                placeholder="ex: 500.00"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Localização
-              </label>
-              <input
+              <Input
+                label="Localização"
                 type="text"
                 value={formData.localizacao}
                 onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="ex: Lisboa"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Duração Máx (min)
-              </label>
-              <input
+              <Input
+                label="Duração Máx (min)"
                 type="number"
                 min="1"
                 value={formData.duracao_max}
                 onChange={(e) => setFormData({ ...formData, duracao_max: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="ex: 180"
               />
             </div>
-          </div>
 
-          {/* Segunda linha - Filtros avançados */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Categoria
-              </label>
-              <select
+            {/* Segunda linha - Filtros avançados */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Input.Select
+                label="Categoria"
                 value={formData.categoria}
                 onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Todas</option>
                 <option value="aventura">Aventura</option>
@@ -185,42 +180,44 @@ function Dashboard() {
                 <option value="esporte">Desporto</option>
                 <option value="cultural">Cultural</option>
                 <option value="gastronomia">Gastronomia</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Clima
-              </label>
-              <select
+              </Input.Select>
+              <Input.Select
+                label="Clima"
                 value={formData.clima}
                 onChange={(e) => setFormData({ ...formData, clima: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Todos</option>
                 <option value="indoor">Indoor</option>
                 <option value="outdoor">Outdoor</option>
                 <option value="ambos">Ambos</option>
-              </select>
+              </Input.Select>
+              <div className="flex items-end">
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  loading={loading}
+                  className="w-full"
+                  size="lg"
+                >
+                  🔍 Buscar Atividades
+                </Button>
+              </div>
             </div>
-            <div className="flex items-end">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
-              >
-                {loading ? 'A buscar...' : '🔍 Buscar Atividades'}
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
+          </form>
+        </Card.Content>
+      </Card>
 
       {/* Lista de Atividades */}
       {atividades.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Atividades Recomendadas ({atividades.length})
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-secondary-900">
+              Atividades Recomendadas
+            </h2>
+            <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
+              {atividades.length} {atividades.length === 1 ? 'atividade' : 'atividades'}
+            </span>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {atividades.map((atividade) => (
               <ActivityCard
@@ -234,11 +231,29 @@ function Dashboard() {
       )}
 
       {atividades.length === 0 && !loading && (
-        <div className="text-center py-12 bg-white rounded-lg shadow-md">
-          <p className="text-gray-600">
-            Nenhuma atividade encontrada. Tente ajustar os filtros de busca.
-          </p>
-        </div>
+        <Card className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <svg
+              className="mx-auto h-12 w-12 text-secondary-400 mb-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <h3 className="text-lg font-semibold text-secondary-900 mb-2">
+              Nenhuma atividade encontrada
+            </h3>
+            <p className="text-secondary-600">
+              Tente ajustar os filtros de busca para encontrar mais resultados.
+            </p>
+          </div>
+        </Card>
       )}
 
       {/* Modal de Reserva */}
@@ -249,7 +264,7 @@ function Dashboard() {
           onSubmit={handleReservationSubmit}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 

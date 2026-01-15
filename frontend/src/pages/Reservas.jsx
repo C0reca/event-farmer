@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 
 function Reservas() {
   const { user, loading: authLoading } = useAuth();
@@ -61,85 +64,121 @@ function Reservas() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Minhas Reservas</h1>
-
+    <AppLayout
+      title="Minhas Reservas"
+      description="Gerencie todas as suas reservas de atividades"
+    >
       {reservas.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md p-12 text-center">
-          <p className="text-gray-600 text-lg mb-4">Nenhuma reserva encontrada.</p>
-          <a
-            href="/dashboard"
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Explorar atividades →
-          </a>
-        </div>
+        <Card className="text-center py-12">
+          <div className="max-w-md mx-auto">
+            <svg
+              className="mx-auto h-12 w-12 text-secondary-400 mb-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+              />
+            </svg>
+            <h3 className="text-lg font-semibold text-secondary-900 mb-2">
+              Nenhuma reserva encontrada
+            </h3>
+            <p className="text-secondary-600 mb-6">
+              Comece a explorar atividades e faça sua primeira reserva!
+            </p>
+            <Button as={Link} to="/dashboard">
+              Explorar Atividades
+            </Button>
+          </div>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          {reservas.map((reserva) => (
-            <div key={reserva.id} className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    {reserva.atividade?.nome || 'Atividade'}
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                    <div>
-                      <span className="font-semibold">Data:</span>{' '}
-                      {new Date(reserva.data).toLocaleDateString('pt-PT')}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Pessoas:</span> {reserva.n_pessoas}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Preço Total:</span>{' '}
-                      €{reserva.preco_total.toFixed(2)}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Estado:</span>{' '}
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          reserva.estado === 'confirmada'
-                            ? 'bg-green-100 text-green-800'
-                            : reserva.estado === 'pendente'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}
-                      >
+          {reservas.map((reserva) => {
+            const estadoColors = {
+              confirmada: 'bg-success-100 text-success-700 border-success-200',
+              pendente: 'bg-warning-100 text-warning-700 border-warning-200',
+              cancelada: 'bg-danger-100 text-danger-700 border-danger-200',
+              recusada: 'bg-secondary-100 text-secondary-700 border-secondary-200'
+            };
+            const estadoColor = estadoColors[reserva.estado] || estadoColors.pendente;
+
+            return (
+              <Card key={reserva.id} hover={true}>
+                <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xl font-bold text-secondary-900">
+                        {reserva.atividade?.nome || 'Atividade'}
+                      </h3>
+                      <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${estadoColor}`}>
                         {reserva.estado}
                       </span>
                     </div>
-                  </div>
-                  {reserva.atividade && (
-                    <div className="mt-4 text-sm text-gray-600">
-                      <p>
-                        <span className="font-semibold">Tipo:</span> {reserva.atividade.tipo}
-                      </p>
-                      <p>
-                        <span className="font-semibold">Preço por pessoa:</span>{' '}
-                        €{reserva.atividade.preco_por_pessoa.toFixed(2)}
-                      </p>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div>
+                        <p className="text-sm text-secondary-500 mb-1">Data</p>
+                        <p className="font-semibold text-secondary-900">
+                          {new Date(reserva.data).toLocaleDateString('pt-PT')}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-500 mb-1">Pessoas</p>
+                        <p className="font-semibold text-secondary-900">{reserva.n_pessoas}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-500 mb-1">Preço Total</p>
+                        <p className="font-semibold text-primary-600">
+                          €{reserva.preco_total.toFixed(2)}
+                        </p>
+                      </div>
+                      {reserva.atividade && (
+                        <div>
+                          <p className="text-sm text-secondary-500 mb-1">Preço/pessoa</p>
+                          <p className="font-semibold text-secondary-900">
+                            €{reserva.atividade.preco_por_pessoa.toFixed(2)}
+                          </p>
+                        </div>
+                      )}
                     </div>
+                    {reserva.atividade && (
+                      <div className="flex flex-wrap gap-2">
+                        <span className="px-2.5 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full">
+                          {reserva.atividade.tipo}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  {reserva.estado === 'pendente' && (
+                    <Button
+                      onClick={() => handleCancel(reserva.id)}
+                      variant="danger"
+                      size="sm"
+                    >
+                      Cancelar
+                    </Button>
                   )}
                 </div>
-                {reserva.estado === 'pendente' && (
-                  <button
-                    onClick={() => handleCancel(reserva.id)}
-                    className="ml-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium"
-                  >
-                    Cancelar
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+              </Card>
+            );
+          })}
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }
 

@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import Card from './ui/Card';
+import Button from './ui/Button';
 
 function ActivityCard({ atividade, onReserve }) {
   const navigate = useNavigate();
@@ -11,95 +13,108 @@ function ActivityCard({ atividade, onReserve }) {
     const hasHalfStar = rating % 1 >= 0.5;
     
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<span key={i} className="text-yellow-400">★</span>);
+      stars.push(<span key={i} className="text-warning-500">★</span>);
     }
     if (hasHalfStar) {
-      stars.push(<span key="half" className="text-yellow-400">☆</span>);
+      stars.push(<span key="half" className="text-warning-500">☆</span>);
     }
     for (let i = stars.length; i < 5; i++) {
-      stars.push(<span key={i} className="text-gray-300">★</span>);
+      stars.push(<span key={i} className="text-secondary-300">★</span>);
     }
     return stars;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow">
+    <Card className="overflow-hidden" hover={true} padding="none">
       <div className="relative">
         <img 
           src={imagemUrl} 
           alt={atividade.nome}
-          className="w-full h-48 object-cover cursor-pointer"
+          className="w-full h-48 object-cover cursor-pointer transition-transform duration-200 hover:scale-105"
           onClick={() => navigate(`/atividade/${atividade.id}`)}
         />
         {atividade.rating_medio > 0 && (
-          <div className="absolute top-2 right-2 bg-white bg-opacity-90 px-2 py-1 rounded-md flex items-center gap-1">
+          <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded-lg flex items-center gap-1 shadow-md">
             {renderStars(atividade.rating_medio)}
-            <span className="text-sm font-semibold ml-1">{atividade.rating_medio.toFixed(1)}</span>
+            <span className="text-sm font-semibold text-secondary-900 ml-1">
+              {atividade.rating_medio.toFixed(1)}
+            </span>
           </div>
         )}
         {atividade.categoria && (
-          <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded-md text-xs font-semibold uppercase">
+          <div className="absolute top-3 left-3 bg-primary-600 text-white px-2.5 py-1 rounded-lg text-xs font-semibold uppercase shadow-md">
             {atividade.categoria}
           </div>
         )}
       </div>
       <div className="p-6">
         <h3 
-          className="text-xl font-bold text-gray-800 mb-2 cursor-pointer hover:text-blue-600"
+          className="text-xl font-bold text-secondary-900 mb-3 cursor-pointer hover:text-primary-600 transition-colors line-clamp-1"
           onClick={() => navigate(`/atividade/${atividade.id}`)}
         >
           {atividade.nome}
         </h3>
-        <div className="flex flex-wrap gap-2 mb-3">
+        
+        <div className="flex flex-wrap gap-2 mb-4">
           {atividade.tipo && (
-            <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-secondary-100 text-secondary-700 text-xs font-medium rounded-full">
               {atividade.tipo}
             </span>
           )}
           {atividade.clima && (
-            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-success-100 text-success-700 text-xs font-medium rounded-full">
               {atividade.clima}
             </span>
           )}
           {atividade.duracao_minutos && (
-            <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+            <span className="px-2.5 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full">
               {atividade.duracao_minutos}min
             </span>
           )}
         </div>
-        <p className="text-gray-600 text-sm mb-2">
-          <span className="font-semibold">📍</span> {atividade.localizacao || 'N/A'}
-        </p>
-        <p className="text-gray-600 text-sm mb-4">
-          <span className="font-semibold">👥</span> até {atividade.capacidade_max} pessoas
-        </p>
+        
+        <div className="space-y-2 mb-4">
+          <p className="text-sm text-secondary-600 flex items-center gap-2">
+            <span className="text-base">📍</span>
+            <span>{atividade.localizacao || 'N/A'}</span>
+          </p>
+          <p className="text-sm text-secondary-600 flex items-center gap-2">
+            <span className="text-base">👥</span>
+            <span>até {atividade.capacidade_max} pessoas</span>
+          </p>
+        </div>
+        
         {atividade.descricao && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{atividade.descricao}</p>
+          <p className="text-sm text-secondary-600 mb-4 line-clamp-2">
+            {atividade.descricao}
+          </p>
         )}
-        <div className="flex justify-between items-center pt-4 border-t">
+        
+        <div className="flex justify-between items-center pt-4 border-t border-secondary-200">
           <div>
-            <span className="text-2xl font-bold text-blue-600">
+            <span className="text-2xl font-bold text-primary-600">
               €{atividade.preco_por_pessoa.toFixed(2)}
             </span>
-            <span className="text-sm text-gray-500">/pessoa</span>
+            <span className="text-sm text-secondary-500 ml-1">/pessoa</span>
           </div>
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={() => navigate(`/atividade/${atividade.id}`)}
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+              variant="outline"
+              size="sm"
             >
-              Ver Detalhes
-            </button>
-            <button
+              Detalhes
+            </Button>
+            <Button
               onClick={() => onReserve(atividade)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition-colors"
+              size="sm"
             >
               Reservar
-            </button>
+            </Button>
           </div>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 

@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 function PerfilEmpresa() {
   const { user, loading: authLoading } = useAuth();
@@ -71,120 +75,113 @@ function PerfilEmpresa() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   if (!empresa) {
-    return <div className="text-center py-12">Empresa não encontrada</div>;
+    return (
+      <AppLayout>
+        <Card className="text-center py-12">
+          <p className="text-secondary-600">Empresa não encontrada</p>
+        </Card>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Gestão de Perfil</h1>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-bold mb-6">Informações da Empresa</h2>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nome da Empresa *
-              </label>
-              <input
+    <AppLayout
+      title="Gestão de Perfil"
+      description="Atualize as informações da sua empresa"
+      maxWidth="4xl"
+    >
+      <Card>
+        <Card.Header>
+          <Card.Title>Informações da Empresa</Card.Title>
+          <Card.Description>
+            Mantenha seus dados atualizados para receber recomendações mais precisas
+          </Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Input
+                label="Nome da Empresa"
                 type="text"
                 required
                 value={formData.nome}
                 onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Setor
-              </label>
-              <input
+              <Input
+                label="Setor"
                 type="text"
                 value={formData.setor}
                 onChange={(e) => setFormData({ ...formData, setor: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="ex: Tecnologia, Saúde, etc."
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nº Funcionários
-              </label>
-              <input
+              <Input
+                label="Nº Funcionários"
                 type="number"
                 min="1"
                 value={formData.n_funcionarios}
                 onChange={(e) => setFormData({ ...formData, n_funcionarios: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Localização
-              </label>
-              <input
+              <Input
+                label="Localização"
                 type="text"
                 value={formData.localizacao}
                 onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="ex: Lisboa"
               />
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Orçamento Médio (€)
-              </label>
-              <input
+              <Input
+                label="Orçamento Médio (€)"
                 type="number"
                 step="0.01"
                 value={formData.orcamento_medio}
                 onChange={(e) => setFormData({ ...formData, orcamento_medio: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Preferências de Atividades
-            </label>
-            <textarea
+            <Input.Textarea
+              label="Preferências de Atividades"
               value={formData.preferencia_atividades}
               onChange={(e) => setFormData({ ...formData, preferencia_atividades: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               rows="4"
               placeholder="Descreva os tipos de atividades que a sua empresa prefere..."
             />
-          </div>
 
-          <div className="flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => navigate('/dashboard')}
-              className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium disabled:opacity-50"
-            >
-              {saving ? 'A guardar...' : 'Guardar Alterações'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            <Card.Footer className="px-0 pb-0">
+              <div className="flex justify-end gap-4 w-full">
+                <Button
+                  type="button"
+                  onClick={() => navigate('/dashboard')}
+                  variant="outline"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={saving}
+                  loading={saving}
+                >
+                  Guardar Alterações
+                </Button>
+              </div>
+            </Card.Footer>
+          </form>
+        </Card.Content>
+      </Card>
+    </AppLayout>
   );
 }
 

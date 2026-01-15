@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
 
 function Admin() {
   const { user, loading: authLoading } = useAuth();
@@ -85,22 +88,30 @@ function Admin() {
   };
 
   if (authLoading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Painel Administrativo</h1>
-
+    <AppLayout
+      title="Painel Administrativo"
+      description="Gerencie atividades, reservas e visualize relatórios"
+    >
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-secondary-200 mb-6">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'dashboard'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
             }`}
           >
             Dashboard
@@ -110,10 +121,10 @@ function Admin() {
               setActiveTab('atividades');
               carregarAtividadesPendentes();
             }}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'atividades'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
             }`}
           >
             Atividades Pendentes ({atividadesPendentes.length})
@@ -123,10 +134,10 @@ function Admin() {
               setActiveTab('relatorios');
               carregarRelatorios();
             }}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'relatorios'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
             }`}
           >
             Relatórios
@@ -137,84 +148,99 @@ function Admin() {
       {/* Dashboard Tab */}
       {activeTab === 'dashboard' && dashboardData && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">Total Empresas</h3>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardData.n_empresas}</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">Total Atividades</h3>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardData.n_atividades}</p>
-            <p className="text-sm text-green-600 mt-1">
-              {dashboardData.n_atividades_aprovadas} aprovadas
-            </p>
-            <p className="text-sm text-yellow-600">
-              {dashboardData.n_atividades_pendentes} pendentes
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">Total Reservas</h3>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardData.n_reservas}</p>
-            <p className="text-sm text-blue-600 mt-1">
-              {dashboardData.n_reservas_confirmadas} confirmadas
-            </p>
-            <p className="text-sm text-yellow-600">
-              {dashboardData.n_reservas_pendentes} pendentes
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-sm font-medium text-gray-500">Total Fornecedores</h3>
-            <p className="text-3xl font-bold text-gray-900 mt-2">{dashboardData.n_fornecedores}</p>
-          </div>
+          <Card>
+            <h3 className="text-sm font-medium text-secondary-500 mb-2">Total Empresas</h3>
+            <p className="text-3xl font-bold text-secondary-900">{dashboardData.n_empresas}</p>
+          </Card>
+          <Card>
+            <h3 className="text-sm font-medium text-secondary-500 mb-2">Total Atividades</h3>
+            <p className="text-3xl font-bold text-secondary-900 mb-2">{dashboardData.n_atividades}</p>
+            <div className="space-y-1">
+              <p className="text-sm text-success-600">
+                {dashboardData.n_atividades_aprovadas} aprovadas
+              </p>
+              <p className="text-sm text-warning-600">
+                {dashboardData.n_atividades_pendentes} pendentes
+              </p>
+            </div>
+          </Card>
+          <Card>
+            <h3 className="text-sm font-medium text-secondary-500 mb-2">Total Reservas</h3>
+            <p className="text-3xl font-bold text-secondary-900 mb-2">{dashboardData.n_reservas}</p>
+            <div className="space-y-1">
+              <p className="text-sm text-primary-600">
+                {dashboardData.n_reservas_confirmadas} confirmadas
+              </p>
+              <p className="text-sm text-warning-600">
+                {dashboardData.n_reservas_pendentes} pendentes
+              </p>
+            </div>
+          </Card>
+          <Card>
+            <h3 className="text-sm font-medium text-secondary-500 mb-2">Total Fornecedores</h3>
+            <p className="text-3xl font-bold text-secondary-900">{dashboardData.n_fornecedores}</p>
+          </Card>
         </div>
       )}
 
       {/* Atividades Pendentes Tab */}
       {activeTab === 'atividades' && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Atividades Pendentes de Aprovação</h2>
+          <h2 className="text-2xl font-bold text-secondary-900 mb-6">Atividades Pendentes de Aprovação</h2>
           {atividadesPendentes.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-6 text-center">
-              <p className="text-gray-600">Nenhuma atividade pendente de aprovação</p>
-            </div>
+            <Card className="text-center py-12">
+              <p className="text-secondary-600">Nenhuma atividade pendente de aprovação</p>
+            </Card>
           ) : (
             <div className="space-y-4">
               {atividadesPendentes.map((atividade) => (
-                <div key={atividade.id} className="bg-white rounded-lg shadow p-6">
-                  <div className="flex justify-between items-start">
+                <Card key={atividade.id} hover={true}>
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900">{atividade.nome}</h3>
-                      <p className="text-gray-600 mt-1">{atividade.descricao}</p>
-                      <div className="mt-3 flex flex-wrap gap-4 text-sm">
-                        <span className="text-gray-500">
-                          <strong>Tipo:</strong> {atividade.tipo}
-                        </span>
-                        <span className="text-gray-500">
-                          <strong>Preço:</strong> €{atividade.preco_por_pessoa}/pessoa
-                        </span>
-                        <span className="text-gray-500">
-                          <strong>Capacidade:</strong> {atividade.capacidade_max} pessoas
-                        </span>
-                        <span className="text-gray-500">
-                          <strong>Localização:</strong> {atividade.localizacao}
-                        </span>
+                      <h3 className="text-xl font-bold text-secondary-900 mb-2">{atividade.nome}</h3>
+                      {atividade.descricao && (
+                        <p className="text-secondary-600 mb-4">{atividade.descricao}</p>
+                      )}
+                      <div className="flex flex-wrap gap-4 text-sm">
+                        <div>
+                          <span className="text-secondary-500">Tipo:</span>{' '}
+                          <span className="font-semibold text-secondary-900">{atividade.tipo}</span>
+                        </div>
+                        <div>
+                          <span className="text-secondary-500">Preço:</span>{' '}
+                          <span className="font-semibold text-primary-600">€{atividade.preco_por_pessoa}/pessoa</span>
+                        </div>
+                        <div>
+                          <span className="text-secondary-500">Capacidade:</span>{' '}
+                          <span className="font-semibold text-secondary-900">{atividade.capacidade_max} pessoas</span>
+                        </div>
+                        {atividade.localizacao && (
+                          <div>
+                            <span className="text-secondary-500">Localização:</span>{' '}
+                            <span className="font-semibold text-secondary-900">{atividade.localizacao}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
-                      <button
+                    <div className="flex gap-2">
+                      <Button
                         onClick={() => aprovarAtividade(atividade.id)}
-                        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md font-medium"
+                        variant="secondary"
+                        size="sm"
+                        className="bg-success-600 hover:bg-success-700"
                       >
                         ✓ Aprovar
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => rejeitarAtividade(atividade.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md font-medium"
+                        variant="danger"
+                        size="sm"
                       >
                         ✗ Rejeitar
-                      </button>
+                      </Button>
                     </div>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}
@@ -224,71 +250,83 @@ function Admin() {
       {/* Relatórios Tab */}
       {activeTab === 'relatorios' && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Relatórios Detalhados</h2>
+          <h2 className="text-2xl font-bold text-secondary-900 mb-6">Relatórios Detalhados</h2>
           {loading ? (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">A carregar relatórios...</p>
-            </div>
+            <Card className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
+              <p className="mt-4 text-secondary-600">A carregar relatórios...</p>
+            </Card>
           ) : relatorios ? (
             <div className="space-y-6">
               {relatorios.reservas_30d !== undefined && (
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">Resumo dos Últimos 30 Dias</h3>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500">Total de Reservas</p>
-                      <p className="text-2xl font-bold text-blue-600">{relatorios.reservas_30d}</p>
+                <Card>
+                  <Card.Header>
+                    <Card.Title>Resumo dos Últimos 30 Dias</Card.Title>
+                  </Card.Header>
+                  <Card.Content>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <p className="text-sm text-secondary-500 mb-2">Total de Reservas</p>
+                        <p className="text-3xl font-bold text-primary-600">{relatorios.reservas_30d}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-secondary-500 mb-2">Faturação Total</p>
+                        <p className="text-3xl font-bold text-success-600">€{relatorios.faturacao_30d?.toFixed(2) || '0.00'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500">Faturação Total</p>
-                      <p className="text-2xl font-bold text-green-600">€{relatorios.faturacao_30d?.toFixed(2) || '0.00'}</p>
-                    </div>
-                  </div>
-                </div>
+                  </Card.Content>
+                </Card>
               )}
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 Atividades Mais Reservadas</h3>
-                {relatorios.top_atividades && relatorios.top_atividades.length > 0 ? (
-                  <ul className="space-y-2">
-                    {relatorios.top_atividades.map((atividade, index) => (
-                      <li key={index} className="flex justify-between items-center py-2 border-b">
-                        <span>{atividade.nome}</span>
-                        <span className="font-bold text-blue-600">{atividade.total_reservas} reservas</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 text-center py-4">Ainda não há atividades com reservas confirmadas</p>
-                )}
-              </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 Fornecedores</h3>
-                {relatorios.top_fornecedores && relatorios.top_fornecedores.length > 0 ? (
-                  <ul className="space-y-2">
-                    {relatorios.top_fornecedores.map((fornecedor, index) => (
-                      <li key={index} className="flex justify-between items-center py-2 border-b">
-                        <div>
-                          <span className="font-medium">{fornecedor.nome}</span>
-                          <p className="text-sm text-gray-500">{fornecedor.total_reservas} reservas</p>
-                        </div>
-                        <span className="font-bold text-green-600">€{fornecedor.faturacao?.toFixed(2) || '0.00'}</span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-gray-500 text-center py-4">Ainda não há fornecedores com reservas confirmadas</p>
-                )}
-              </div>
+              <Card>
+                <Card.Header>
+                  <Card.Title>Top 5 Atividades Mais Reservadas</Card.Title>
+                </Card.Header>
+                <Card.Content>
+                  {relatorios.top_atividades && relatorios.top_atividades.length > 0 ? (
+                    <ul className="space-y-3">
+                      {relatorios.top_atividades.map((atividade, index) => (
+                        <li key={index} className="flex justify-between items-center py-3 border-b border-secondary-200 last:border-0">
+                          <span className="font-medium text-secondary-900">{atividade.nome}</span>
+                          <span className="font-bold text-primary-600">{atividade.total_reservas} reservas</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-secondary-500 text-center py-4">Ainda não há atividades com reservas confirmadas</p>
+                  )}
+                </Card.Content>
+              </Card>
+              <Card>
+                <Card.Header>
+                  <Card.Title>Top 5 Fornecedores</Card.Title>
+                </Card.Header>
+                <Card.Content>
+                  {relatorios.top_fornecedores && relatorios.top_fornecedores.length > 0 ? (
+                    <ul className="space-y-3">
+                      {relatorios.top_fornecedores.map((fornecedor, index) => (
+                        <li key={index} className="flex justify-between items-center py-3 border-b border-secondary-200 last:border-0">
+                          <div>
+                            <span className="font-medium text-secondary-900">{fornecedor.nome}</span>
+                            <p className="text-sm text-secondary-500">{fornecedor.total_reservas} reservas</p>
+                          </div>
+                          <span className="font-bold text-success-600">€{fornecedor.faturacao?.toFixed(2) || '0.00'}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-secondary-500 text-center py-4">Ainda não há fornecedores com reservas confirmadas</p>
+                  )}
+                </Card.Content>
+              </Card>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-6 text-center">
-              <p className="text-gray-600">Clique em "Relatórios" para carregar os dados</p>
-            </div>
+            <Card className="text-center py-12">
+              <p className="text-secondary-600">Clique em "Relatórios" para carregar os dados</p>
+            </Card>
           )}
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }
 

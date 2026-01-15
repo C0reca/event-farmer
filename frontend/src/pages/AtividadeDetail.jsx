@@ -3,6 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '../services/api';
 import ReservationForm from '../components/ReservationForm';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 function AtividadeDetail() {
   const { id } = useParams();
@@ -80,7 +84,14 @@ function AtividadeDetail() {
   };
 
   if (loading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   if (!atividade) {
@@ -91,20 +102,21 @@ function AtividadeDetail() {
   const imagemPrincipal = imagens[0] || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800';
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <AppLayout maxWidth="7xl" showHeader={false}>
       {/* Botão Voltar */}
-      <button
+      <Button
         onClick={() => navigate(-1)}
-        className="mb-4 text-blue-600 hover:text-blue-700 flex items-center gap-2"
+        variant="ghost"
+        className="mb-6"
       >
         ← Voltar
-      </button>
+      </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Coluna Principal */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           {/* Galeria de Imagens */}
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+          <Card padding="none" className="overflow-hidden">
             <img 
               src={imagemPrincipal} 
               alt={atividade.nome}
@@ -117,164 +129,166 @@ function AtividadeDetail() {
                     key={idx}
                     src={img} 
                     alt={`${atividade.nome} ${idx + 2}`}
-                    className="w-full h-20 object-cover rounded cursor-pointer hover:opacity-75"
+                    className="w-full h-20 object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
                   />
                 ))}
               </div>
             )}
-          </div>
+          </Card>
 
           {/* Informações */}
-          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">{atividade.nome}</h1>
-                <div className="flex items-center gap-4 mb-4">
-                  {atividade.rating_medio > 0 && (
-                    <div className="flex items-center gap-2">
-                      {renderStars(Math.round(atividade.rating_medio))}
-                      <span className="text-lg font-semibold">{atividade.rating_medio.toFixed(1)}</span>
-                      <span className="text-gray-500">({atividade.total_avaliacoes || 0} avaliações)</span>
-                    </div>
-                  )}
-                  {atividade.categoria && (
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
-                      {atividade.categoria}
-                    </span>
-                  )}
+          <Card>
+            <div className="mb-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-secondary-900 mb-3">{atividade.nome}</h1>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    {atividade.rating_medio > 0 && (
+                      <div className="flex items-center gap-2">
+                        {renderStars(Math.round(atividade.rating_medio))}
+                        <span className="text-lg font-semibold text-secondary-900">{atividade.rating_medio.toFixed(1)}</span>
+                        <span className="text-secondary-500 text-sm">({atividade.total_avaliacoes || 0} avaliações)</span>
+                      </div>
+                    )}
+                    {atividade.categoria && (
+                      <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
+                        {atividade.categoria}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div>
-                <p className="text-sm text-gray-500">Tipo</p>
-                <p className="font-semibold">{atividade.tipo}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Localização</p>
-                <p className="font-semibold">📍 {atividade.localizacao || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-500">Capacidade</p>
-                <p className="font-semibold">👥 {atividade.capacidade_max} pessoas</p>
-              </div>
-              {atividade.duracao_minutos && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div>
-                  <p className="text-sm text-gray-500">Duração</p>
-                  <p className="font-semibold">⏱️ {atividade.duracao_minutos} min</p>
+                  <p className="text-sm text-secondary-500 mb-1">Tipo</p>
+                  <p className="font-semibold text-secondary-900">{atividade.tipo}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Localização</p>
+                  <p className="font-semibold text-secondary-900">📍 {atividade.localizacao || 'N/A'}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-secondary-500 mb-1">Capacidade</p>
+                  <p className="font-semibold text-secondary-900">👥 {atividade.capacidade_max} pessoas</p>
+                </div>
+                {atividade.duracao_minutos && (
+                  <div>
+                    <p className="text-sm text-secondary-500 mb-1">Duração</p>
+                    <p className="font-semibold text-secondary-900">⏱️ {atividade.duracao_minutos} min</p>
+                  </div>
+                )}
+              </div>
+
+              {atividade.descricao && (
+                <div className="mb-6">
+                  <h2 className="text-xl font-bold mb-2 text-secondary-900">Descrição</h2>
+                  <p className="text-secondary-700 leading-relaxed">{atividade.descricao}</p>
+                </div>
+              )}
+
+              {/* Mapa (placeholder) */}
+              {atividade.localizacao && (
+                <div>
+                  <h2 className="text-xl font-bold mb-2 text-secondary-900">Localização</h2>
+                  <div className="bg-secondary-200 h-64 rounded-lg flex items-center justify-center">
+                    <p className="text-secondary-500">Mapa de {atividade.localizacao} (Integração Google Maps futura)</p>
+                  </div>
                 </div>
               )}
             </div>
-
-            {atividade.descricao && (
-              <div className="mb-6">
-                <h2 className="text-xl font-bold mb-2">Descrição</h2>
-                <p className="text-gray-700">{atividade.descricao}</p>
-              </div>
-            )}
-
-            {/* Mapa (placeholder) */}
-            {atividade.localizacao && (
-              <div className="mb-6">
-                <h2 className="text-xl font-bold mb-2">Localização</h2>
-                <div className="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Mapa de {atividade.localizacao} (Integração Google Maps futura)</p>
-                </div>
-              </div>
-            )}
-          </div>
+          </Card>
 
           {/* Avaliações */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold mb-4">Avaliações ({avaliacoes.length})</h2>
-            
-            {/* Formulário de Avaliação */}
-            <form onSubmit={handleAvaliar} className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold mb-2">Avalie esta atividade</h3>
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-2">Avaliação (1-5 estrelas)</label>
-                <div className="flex gap-1">
-                  {renderStars(rating, true, setRating)}
-                </div>
-              </div>
-              <div className="mb-3">
-                <label className="block text-sm font-medium mb-2">Comentário (opcional)</label>
-                <textarea
-                  value={comentario}
-                  onChange={(e) => setComentario(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                  rows="3"
-                  placeholder="Partilhe a sua experiência..."
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
-              >
-                Enviar Avaliação
-              </button>
-            </form>
-
-            {/* Lista de Avaliações */}
-            {avaliacoes.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">Ainda não há avaliações para esta atividade.</p>
-            ) : (
-              <div className="space-y-4">
-                {avaliacoes.map((avaliacao) => (
-                  <div key={avaliacao.id} className="border-b pb-4 last:border-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      {renderStars(avaliacao.rating)}
-                      <span className="text-sm text-gray-500">
-                        {new Date(avaliacao.data_criacao).toLocaleDateString('pt-PT')}
-                      </span>
+          <Card>
+            <Card.Header>
+              <Card.Title>Avaliações ({avaliacoes.length})</Card.Title>
+            </Card.Header>
+            <Card.Content>
+              {/* Formulário de Avaliação */}
+              <Card className="mb-6 bg-secondary-50" padding="md">
+                <h3 className="font-semibold mb-4 text-secondary-900">Avalie esta atividade</h3>
+                <form onSubmit={handleAvaliar} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2 text-secondary-700">Avaliação (1-5 estrelas)</label>
+                    <div className="flex gap-1">
+                      {renderStars(rating, true, setRating)}
                     </div>
-                    {avaliacao.comentario && (
-                      <p className="text-gray-700">{avaliacao.comentario}</p>
-                    )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  <Input.Textarea
+                    label="Comentário (opcional)"
+                    value={comentario}
+                    onChange={(e) => setComentario(e.target.value)}
+                    rows="3"
+                    placeholder="Partilhe a sua experiência..."
+                  />
+                  <Button type="submit">
+                    Enviar Avaliação
+                  </Button>
+                </form>
+              </Card>
+
+              {/* Lista de Avaliações */}
+              {avaliacoes.length === 0 ? (
+                <p className="text-secondary-500 text-center py-8">Ainda não há avaliações para esta atividade.</p>
+              ) : (
+                <div className="space-y-4">
+                  {avaliacoes.map((avaliacao) => (
+                    <div key={avaliacao.id} className="border-b border-secondary-200 pb-4 last:border-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        {renderStars(avaliacao.rating)}
+                        <span className="text-sm text-secondary-500">
+                          {new Date(avaliacao.data_criacao).toLocaleDateString('pt-PT')}
+                        </span>
+                      </div>
+                      {avaliacao.comentario && (
+                        <p className="text-secondary-700">{avaliacao.comentario}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card.Content>
+          </Card>
         </div>
 
         {/* Sidebar - Reserva */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <Card className="sticky top-4">
             <div className="mb-6">
-              <div className="text-4xl font-bold text-blue-600 mb-1">
+              <div className="text-4xl font-bold text-primary-600 mb-1">
                 €{atividade.preco_por_pessoa.toFixed(2)}
               </div>
-              <div className="text-gray-500">por pessoa</div>
+              <div className="text-secondary-500">por pessoa</div>
             </div>
 
             <div className="space-y-4 mb-6">
               <div className="flex justify-between">
-                <span className="text-gray-600">Capacidade máxima:</span>
-                <span className="font-semibold">{atividade.capacidade_max} pessoas</span>
+                <span className="text-secondary-600">Capacidade máxima:</span>
+                <span className="font-semibold text-secondary-900">{atividade.capacidade_max} pessoas</span>
               </div>
               {atividade.clima && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Clima:</span>
-                  <span className="font-semibold capitalize">{atividade.clima}</span>
+                  <span className="text-secondary-600">Clima:</span>
+                  <span className="font-semibold text-secondary-900 capitalize">{atividade.clima}</span>
                 </div>
               )}
               {atividade.duracao_minutos && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Duração:</span>
-                  <span className="font-semibold">{atividade.duracao_minutos} minutos</span>
+                  <span className="text-secondary-600">Duração:</span>
+                  <span className="font-semibold text-secondary-900">{atividade.duracao_minutos} minutos</span>
                 </div>
               )}
             </div>
 
-            <button
+            <Button
               onClick={() => setShowReservationForm(true)}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-bold text-lg transition-colors"
+              className="w-full"
+              size="lg"
             >
               Reservar Agora
-            </button>
-          </div>
+            </Button>
+          </Card>
         </div>
       </div>
 
@@ -294,7 +308,7 @@ function AtividadeDetail() {
           }}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 

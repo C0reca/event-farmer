@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import Button from './ui/Button';
 
 function Navbar() {
   const { user, logout } = useAuth();
@@ -11,56 +12,84 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
-            <Link to="/" className="flex items-center px-2 py-2 text-xl font-bold text-blue-600">
-              TeamEvents
+    <nav className="bg-white border-b border-grey shadow-sm sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto container-padding">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center">
+            <Link 
+              to="/" 
+              className="flex items-center px-2 py-2 text-2xl font-bold text-primary hover:text-primary-600 transition-colors"
+            >
+              TeamSync
             </Link>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3">
             {user ? (
               <>
-                <span className="text-gray-700">Olá, {user.nome}</span>
+                <span className="text-sm text-navy-600 font-medium hidden sm:inline">
+                  Olá, <span className="text-navy-900 font-semibold">{user.nome}</span>
+                </span>
                 {user.tipo === 'empresa' && (
                   <>
-                    <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <Link 
+                      to="/dashboard" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
                       Dashboard
                     </Link>
-                    <Link to="/reservas" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <Link 
+                      to="/reservas" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
                       Reservas
                     </Link>
-                    <Link to="/perfil" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                    <Link 
+                      to="/perfil" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
                       Perfil
                     </Link>
                   </>
                 )}
                 {user.tipo === 'fornecedor' && (
-                  <Link to="/fornecedor" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                  <Link 
+                    to="/fornecedor" 
+                    className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                  >
                     Painel
                   </Link>
                 )}
                 {user.tipo === 'admin' && (
-                  <Link to="/admin" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                  <Link 
+                    to="/admin" 
+                    className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                  >
                     Admin
                   </Link>
                 )}
-                <button
+                <Button
                   onClick={handleLogout}
-                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium"
+                  variant="danger"
+                  size="sm"
                 >
                   Sair
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <Link to="/login" className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                <Link 
+                  to="/login" 
+                  className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                >
                   Login
                 </Link>
-                <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                <Button
+                  as={Link}
+                  to="/register"
+                  size="sm"
+                >
                   Registar
-                </Link>
+                </Button>
               </>
             )}
           </div>

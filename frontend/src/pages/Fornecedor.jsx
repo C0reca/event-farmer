@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
+import AppLayout from '../components/layout/AppLayout';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Input from '../components/ui/Input';
 
 function Fornecedor() {
   const { user, loading: authLoading } = useAuth();
@@ -130,42 +134,51 @@ function Fornecedor() {
   };
 
   if (authLoading || loading) {
-    return <div className="text-center py-12">A carregar...</div>;
+    return (
+      <AppLayout>
+        <div className="text-center py-12">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+          <p className="mt-4 text-secondary-600">A carregar...</p>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Painel do Fornecedor</h1>
+    <AppLayout
+      title="Painel do Fornecedor"
+      description="Gerencie suas atividades e reservas recebidas"
+    >
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         {activeTab === 'atividades' && (
-          <button
+          <Button
             onClick={() => setShowForm(!showForm)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+            variant={showForm ? 'outline' : 'primary'}
           >
             {showForm ? 'Cancelar' : '+ Nova Atividade'}
-          </button>
+          </Button>
         )}
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 border-b border-gray-200">
+      <div className="mb-6 border-b border-secondary-200">
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('atividades')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'atividades'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
             }`}
           >
             Minhas Atividades ({atividades.length})
           </button>
           <button
             onClick={() => setActiveTab('reservas')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'reservas'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-primary-500 text-primary-600'
+                : 'border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300'
             }`}
           >
             Reservas Recebidas ({reservas.length})
@@ -175,43 +188,35 @@ function Fornecedor() {
 
       {/* Formulário de Nova Atividade */}
       {showForm && activeTab === 'atividades' && (
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-bold mb-4">Criar Nova Atividade</h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Nome *
-                </label>
-                <input
+        <Card className="mb-8">
+          <Card.Header>
+            <Card.Title>Criar Nova Atividade</Card.Title>
+            <Card.Description>
+              Preencha os dados abaixo para criar uma nova atividade. A atividade ficará pendente até aprovação do administrador.
+            </Card.Description>
+          </Card.Header>
+          <Card.Content>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Nome"
                   type="text"
                   required
                   value={formData.nome}
                   onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tipo *
-                </label>
-                <input
+                <Input
+                  label="Tipo"
                   type="text"
                   required
                   value={formData.tipo}
                   onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                   placeholder="ex: canoagem, paintball"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Categoria
-                </label>
-                <select
+                <Input.Select
+                  label="Categoria"
                   value={formData.categoria}
                   onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 >
                   <option value="">Selecione...</option>
                   <option value="aventura">Aventura</option>
@@ -220,150 +225,127 @@ function Fornecedor() {
                   <option value="esporte">Desporto</option>
                   <option value="cultural">Cultural</option>
                   <option value="gastronomia">Gastronomia</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Clima
-                </label>
-                <select
+                </Input.Select>
+                <Input.Select
+                  label="Clima"
                   value={formData.clima}
                   onChange={(e) => setFormData({ ...formData, clima: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 >
                   <option value="">Selecione...</option>
                   <option value="indoor">Indoor</option>
                   <option value="outdoor">Outdoor</option>
                   <option value="ambos">Ambos</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Preço por Pessoa (€) *
-                </label>
-                <input
+                </Input.Select>
+                <Input
+                  label="Preço por Pessoa (€)"
                   type="number"
                   step="0.01"
                   required
                   value={formData.preco_por_pessoa}
                   onChange={(e) => setFormData({ ...formData, preco_por_pessoa: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Capacidade Máxima *
-                </label>
-                <input
+                <Input
+                  label="Capacidade Máxima"
                   type="number"
                   required
+                  min="1"
                   value={formData.capacidade_max}
                   onChange={(e) => setFormData({ ...formData, capacidade_max: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Duração (minutos)
-                </label>
-                <input
+                <Input
+                  label="Duração (minutos)"
                   type="number"
+                  min="1"
                   value={formData.duracao_minutos}
                   onChange={(e) => setFormData({ ...formData, duracao_minutos: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Localização
-                </label>
-                <input
+                <Input
+                  label="Localização"
                   type="text"
                   value={formData.localizacao}
                   onChange={(e) => setFormData({ ...formData, localizacao: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
+                  placeholder="ex: Lisboa"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  URL da Imagem
-                </label>
-                <input
+                <Input
+                  label="URL da Imagem"
                   type="url"
                   value={formData.imagens}
                   onChange={(e) => setFormData({ ...formData, imagens: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
+                  placeholder="https://exemplo.com/imagem.jpg"
                 />
               </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Descrição
-              </label>
-              <textarea
+              <Input.Textarea
+                label="Descrição"
                 value={formData.descricao}
                 onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500"
-                rows="3"
+                rows="4"
+                placeholder="Descreva a atividade..."
               />
-            </div>
-            <button
-              type="submit"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium"
-            >
-              Criar Atividade
-            </button>
-          </form>
-        </div>
+              <Button type="submit">
+                Criar Atividade
+              </Button>
+            </form>
+          </Card.Content>
+        </Card>
       )}
 
       {/* Tab: Atividades */}
       {activeTab === 'atividades' && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Minhas Atividades ({atividades.length})
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-secondary-900">
+              Minhas Atividades
+            </h2>
+            <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
+              {atividades.length} {atividades.length === 1 ? 'atividade' : 'atividades'}
+            </span>
+          </div>
           {atividades.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <p className="text-gray-600 text-lg">Nenhuma atividade criada ainda.</p>
-            </div>
+            <Card className="text-center py-12">
+              <p className="text-secondary-600 text-lg">Nenhuma atividade criada ainda.</p>
+            </Card>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {atividades.map((atividade) => (
-                <div key={atividade.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-gray-800">{atividade.nome}</h3>
-                      {atividade.aprovada ? (
-                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">Aprovada</span>
-                      ) : (
-                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full">Pendente</span>
-                      )}
-                    </div>
-                    <p className="text-gray-600 text-sm mb-2">
-                      <span className="font-semibold">Tipo:</span> {atividade.tipo}
+                <Card key={atividade.id} hover={true}>
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-lg font-bold text-secondary-900 flex-1">{atividade.nome}</h3>
+                    {atividade.aprovada ? (
+                      <span className="px-2.5 py-1 bg-success-100 text-success-700 text-xs font-semibold rounded-full ml-2">
+                        Aprovada
+                      </span>
+                    ) : (
+                      <span className="px-2.5 py-1 bg-warning-100 text-warning-700 text-xs font-semibold rounded-full ml-2">
+                        Pendente
+                      </span>
+                    )}
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <p className="text-secondary-600">
+                      <span className="font-semibold text-secondary-900">Tipo:</span> {atividade.tipo}
                     </p>
                     {atividade.categoria && (
-                      <p className="text-gray-600 text-sm mb-2">
-                        <span className="font-semibold">Categoria:</span> {atividade.categoria}
+                      <p className="text-secondary-600">
+                        <span className="font-semibold text-secondary-900">Categoria:</span> {atividade.categoria}
                       </p>
                     )}
-                    <p className="text-gray-600 text-sm mb-2">
-                      <span className="font-semibold">Preço:</span> €{atividade.preco_por_pessoa.toFixed(2)}/pessoa
+                    <p className="text-secondary-600">
+                      <span className="font-semibold text-secondary-900">Preço:</span>{' '}
+                      <span className="text-primary-600 font-bold">€{atividade.preco_por_pessoa.toFixed(2)}</span>/pessoa
                     </p>
-                    <p className="text-gray-600 text-sm mb-2">
-                      <span className="font-semibold">Capacidade:</span> {atividade.capacidade_max} pessoas
+                    <p className="text-secondary-600">
+                      <span className="font-semibold text-secondary-900">Capacidade:</span> {atividade.capacidade_max} pessoas
                     </p>
                     {atividade.localizacao && (
-                      <p className="text-gray-600 text-sm mb-2">
-                        <span className="font-semibold">Localização:</span> {atividade.localizacao}
+                      <p className="text-secondary-600">
+                        <span className="font-semibold text-secondary-900">📍</span> {atividade.localizacao}
                       </p>
                     )}
                     {atividade.descricao && (
-                      <p className="text-gray-600 text-sm line-clamp-2">{atividade.descricao}</p>
+                      <p className="text-secondary-600 line-clamp-2 mt-2">{atividade.descricao}</p>
                     )}
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}
@@ -373,76 +355,88 @@ function Fornecedor() {
       {/* Tab: Reservas */}
       {activeTab === 'reservas' && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Reservas Recebidas ({reservas.length})
-          </h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-secondary-900">
+              Reservas Recebidas
+            </h2>
+            <span className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm font-semibold">
+              {reservas.length} {reservas.length === 1 ? 'reserva' : 'reservas'}
+            </span>
+          </div>
           {reservas.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
-              <p className="text-gray-600 text-lg">Nenhuma reserva recebida ainda.</p>
-            </div>
+            <Card className="text-center py-12">
+              <p className="text-secondary-600 text-lg">Nenhuma reserva recebida ainda.</p>
+            </Card>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {reservas.map((reserva) => (
-                <div key={reserva.id} className="bg-white rounded-lg shadow-md p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {reserva.atividade?.nome || 'Atividade'}
-                      </h3>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
-                        <div>
-                          <span className="font-semibold">Data:</span>{' '}
-                          {new Date(reserva.data).toLocaleDateString('pt-PT')}
-                        </div>
-                        <div>
-                          <span className="font-semibold">Pessoas:</span> {reserva.n_pessoas}
-                        </div>
-                        <div>
-                          <span className="font-semibold">Preço Total:</span>{' '}
-                          €{reserva.preco_total.toFixed(2)}
-                        </div>
-                        <div>
-                          <span className="font-semibold">Estado:</span>{' '}
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              reserva.estado === 'confirmada'
-                                ? 'bg-green-100 text-green-800'
-                                : reserva.estado === 'pendente'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : reserva.estado === 'recusada'
-                                ? 'bg-red-100 text-red-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}
-                          >
+              {reservas.map((reserva) => {
+                const estadoColors = {
+                  confirmada: 'bg-success-100 text-success-700 border-success-200',
+                  pendente: 'bg-warning-100 text-warning-700 border-warning-200',
+                  recusada: 'bg-danger-100 text-danger-700 border-danger-200',
+                  cancelada: 'bg-secondary-100 text-secondary-700 border-secondary-200'
+                };
+                const estadoColor = estadoColors[reserva.estado] || estadoColors.pendente;
+
+                return (
+                  <Card key={reserva.id} hover={true}>
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-4">
+                          <h3 className="text-xl font-bold text-secondary-900">
+                            {reserva.atividade?.nome || 'Atividade'}
+                          </h3>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${estadoColor}`}>
                             {reserva.estado}
                           </span>
                         </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-secondary-500 mb-1">Data</p>
+                            <p className="font-semibold text-secondary-900">
+                              {new Date(reserva.data).toLocaleDateString('pt-PT')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-secondary-500 mb-1">Pessoas</p>
+                            <p className="font-semibold text-secondary-900">{reserva.n_pessoas}</p>
+                          </div>
+                          <div>
+                            <p className="text-secondary-500 mb-1">Preço Total</p>
+                            <p className="font-semibold text-primary-600">
+                              €{reserva.preco_total.toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
                       </div>
+                      {reserva.estado === 'pendente' && (
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleAceitarReserva(reserva.id)}
+                            variant="secondary"
+                            size="sm"
+                            className="bg-success-600 hover:bg-success-700"
+                          >
+                            ✓ Aceitar
+                          </Button>
+                          <Button
+                            onClick={() => handleRecusarReserva(reserva.id)}
+                            variant="danger"
+                            size="sm"
+                          >
+                            ✗ Recusar
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    {reserva.estado === 'pendente' && (
-                      <div className="flex gap-2 ml-4">
-                        <button
-                          onClick={() => handleAceitarReserva(reserva.id)}
-                          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium"
-                        >
-                          ✓ Aceitar
-                        </button>
-                        <button
-                          onClick={() => handleRecusarReserva(reserva.id)}
-                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium"
-                        >
-                          ✗ Recusar
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </div>
       )}
-    </div>
+    </AppLayout>
   );
 }
 

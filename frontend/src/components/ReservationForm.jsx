@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import Card from './ui/Card';
+import Button from './ui/Button';
+import Input from './ui/Input';
 
 function ReservationForm({ atividade, onClose, onSubmit }) {
   const [formData, setFormData] = useState({
@@ -15,63 +18,68 @@ function ReservationForm({ atividade, onClose, onSubmit }) {
     });
   };
 
+  const precoTotal = (atividade.preco_por_pessoa * formData.n_pessoas).toFixed(2);
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-        <h2 className="text-2xl font-bold mb-4">Reservar: {atividade.nome}</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Data
-            </label>
-            <input
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <Card className="max-w-md w-full" shadow="xl">
+        <Card.Header>
+          <Card.Title>Reservar Atividade</Card.Title>
+          <Card.Description>{atividade.nome}</Card.Description>
+        </Card.Header>
+        <Card.Content>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Data"
               type="date"
               required
               value={formData.data}
               onChange={(e) => setFormData({ ...formData, data: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               min={new Date().toISOString().split('T')[0]}
             />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-              Número de Pessoas
-            </label>
-            <input
+            
+            <Input
+              label="Número de Pessoas"
               type="number"
               required
               min="1"
               max={atividade.capacidade_max}
               value={formData.n_pessoas}
               onChange={(e) => setFormData({ ...formData, n_pessoas: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              helperText={`Capacidade máxima: ${atividade.capacidade_max} pessoas`}
             />
-            <p className="text-sm text-gray-500 mt-1">
-              Capacidade máxima: {atividade.capacidade_max} pessoas
-            </p>
-          </div>
-          <div className="mb-4">
-            <p className="text-lg font-semibold">
-              Preço Total: €{(atividade.preco_por_pessoa * formData.n_pessoas).toFixed(2)}
-            </p>
-          </div>
-          <div className="flex justify-end space-x-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md font-medium"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium"
-            >
-              Confirmar Reserva
-            </button>
-          </div>
-        </form>
-      </div>
+            
+            <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
+              <div className="flex items-baseline justify-between">
+                <span className="text-sm font-medium text-secondary-700">Preço Total:</span>
+                <span className="text-2xl font-bold text-primary-600">
+                  €{precoTotal}
+                </span>
+              </div>
+              <p className="text-xs text-secondary-500 mt-1">
+                €{atividade.preco_por_pessoa.toFixed(2)} por pessoa × {formData.n_pessoas} pessoas
+              </p>
+            </div>
+            
+            <Card.Footer className="pt-4 pb-0 px-0">
+              <div className="flex justify-end gap-3 w-full">
+                <Button
+                  type="button"
+                  onClick={onClose}
+                  variant="outline"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                >
+                  Confirmar Reserva
+                </Button>
+              </div>
+            </Card.Footer>
+          </form>
+        </Card.Content>
+      </Card>
     </div>
   );
 }
