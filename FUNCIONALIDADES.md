@@ -2,6 +2,8 @@
 
 Este documento lista todas as funcionalidades implementadas na plataforma TeamSync até o momento.
 
+> **Nota**: Para a visão de produto, North Star Metric e escopo completo do MVP, consulte [VISAO_PRODUTO.md](./VISAO_PRODUTO.md)
+
 ---
 
 ## 🔐 Autenticação e Autorização
@@ -381,18 +383,38 @@ Este documento lista todas as funcionalidades implementadas na plataforma TeamSy
 
 ## 📝 Notas Importantes
 
+### Status vs MVP
+
+**Funcionalidades MVP Must-have ainda não implementadas:**
+- ❌ Sistema de RFQ (Request for Quote) - pedido de proposta
+- ❌ Comparação de propostas lado a lado
+- ❌ Sistema de pagamento (checkout com gateway)
+- ❌ Página do evento completa (single source of truth)
+- ❌ Sistema de mensagens/chat entre empresa e fornecedor
+- ❌ Notificações por email
+- ❌ Onboarding completo do fornecedor (dados legais, IBAN, verificação)
+- ❌ Gestão de disponibilidade (calendário ou confirmação por pedido)
+- ❌ Execução do evento (checklist, upload documentos, notas)
+- ❌ Pagamentos e reconciliação (comissões, payouts, faturas)
+
+**Ver [VISAO_PRODUTO.md](./VISAO_PRODUTO.md) para detalhes completos do escopo do MVP.**
+
 ### Limitações Conhecidas
 - ⚠️ Sistema de pagamento ainda não implementado (apenas cálculo de preços)
 - ⚠️ Upload de imagens ainda não implementado (apenas URLs)
 - ⚠️ Notificações em tempo real ainda não implementadas
 - ⚠️ Sistema de mensagens entre empresa e fornecedor ainda não implementado
 - ⚠️ Filtros avançados na busca de atividades podem ser expandidos
+- ⚠️ Brief estruturado não implementado (existe busca com filtros básicos)
+- ⚠️ RFQ (Request for Quote) não implementado
 
-### Melhorias Futuras Sugeridas
-- 🔄 Integração com gateway de pagamento
+### Melhorias Futuras Sugeridas (Prioritárias para MVP)
+- 🔄 **Crítico**: Sistema de RFQ e propostas
+- 🔄 **Crítico**: Integração com gateway de pagamento
+- 🔄 **Crítico**: Sistema de mensagens/chat
+- 🔄 **Crítico**: Página do evento completa (single source of truth)
 - 🔄 Sistema de upload de imagens
 - 🔄 Notificações push/email
-- 🔄 Chat/mensagens entre utilizadores
 - 🔄 Sistema de favoritos
 - 🔄 Compartilhamento de atividades
 - 🔄 Calendário integrado

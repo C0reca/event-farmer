@@ -17,4 +17,5 @@ class Fornecedor(Base):
     user = relationship("User", back_populates="fornecedor")
     atividades = relationship("Atividade", back_populates="fornecedor")
     avaliacoes = relationship("Avaliacao", back_populates="fornecedor")
+    propostas = relationship("Proposta", back_populates="fornecedor")
 

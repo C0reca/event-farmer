@@ -21,4 +21,5 @@ class Empresa(Base):
     reservas = relationship("Reserva", back_populates="empresa")
     itinerarios = relationship("Itinerario", back_populates="empresa")
     avaliacoes = relationship("Avaliacao", back_populates="empresa")
+    rfqs = relationship("RFQ", back_populates="empresa")
 

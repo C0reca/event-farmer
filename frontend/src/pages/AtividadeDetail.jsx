@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
 import ReservationForm from '../components/ReservationForm';
+import ReservationFormGuest from '../components/ReservationFormGuest';
 import AppLayout from '../components/layout/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -11,6 +13,7 @@ import Input from '../components/ui/Input';
 function AtividadeDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [atividade, setAtividade] = useState(null);
   const [avaliacoes, setAvaliacaoes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -294,19 +297,35 @@ function AtividadeDetail() {
 
       {/* Modal de Reserva */}
       {showReservationForm && (
-        <ReservationForm
-          atividade={atividade}
-          onClose={() => setShowReservationForm(false)}
-          onSubmit={async (data) => {
-            try {
-              await api.post('/reservas', data);
-              toast.success('Reserva criada com sucesso!');
-              setShowReservationForm(false);
-            } catch (error) {
-              toast.error('Erro ao criar reserva: ' + (error.response?.data?.detail || 'Tente novamente.'));
-            }
-          }}
-        />
+        user && user.tipo === 'empresa' ? (
+          <ReservationForm
+            atividade={atividade}
+            onClose={() => setShowReservationForm(false)}
+            onSubmit={async (data) => {
+              try {
+                await api.post('/reservas', data);
+                toast.success('Reserva criada com sucesso!');
+                setShowReservationForm(false);
+              } catch (error) {
+                toast.error('Erro ao criar reserva: ' + (error.response?.data?.detail || 'Tente novamente.'));
+              }
+            }}
+          />
+        ) : (
+          <ReservationFormGuest
+            atividade={atividade}
+            onClose={() => setShowReservationForm(false)}
+            onSubmit={async (data) => {
+              try {
+                await api.post('/reservas/guest', data);
+                toast.success('Reserva criada com sucesso! Receberá um email de confirmação em breve.');
+                setShowReservationForm(false);
+              } catch (error) {
+                toast.error('Erro ao criar reserva: ' + (error.response?.data?.detail || 'Tente novamente.'));
+              }
+            }}
+          />
+        )
       )}
     </AppLayout>
   );

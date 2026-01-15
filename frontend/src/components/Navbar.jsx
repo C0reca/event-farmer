@@ -38,6 +38,12 @@ function Navbar() {
                       Dashboard
                     </Link>
                     <Link 
+                      to="/rfqs" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
+                      RFQs
+                    </Link>
+                    <Link 
                       to="/reservas" 
                       className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
                     >
@@ -52,12 +58,20 @@ function Navbar() {
                   </>
                 )}
                 {user.tipo === 'fornecedor' && (
-                  <Link 
-                    to="/fornecedor" 
-                    className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
-                  >
-                    Painel
-                  </Link>
+                  <>
+                    <Link 
+                      to="/fornecedor" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
+                      Painel
+                    </Link>
+                    <Link 
+                      to="/fornecedor/rfqs" 
+                      className="text-sm text-navy-700 hover:text-primary px-3 py-2 rounded-xl font-medium transition-colors"
+                    >
+                      RFQs
+                    </Link>
+                  </>
                 )}
                 {user.tipo === 'admin' && (
                   <Link 

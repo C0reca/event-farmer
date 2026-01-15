@@ -28,7 +28,7 @@ app.add_middleware(
 )
 
 # Routers
-from app.routers import fornecedores, avaliacoes
+from app.routers import fornecedores, avaliacoes, rfq, propostas, evento, pagamentos, eventos
 
 app.include_router(auth.router)
 app.include_router(empresas.router)
@@ -38,6 +38,11 @@ app.include_router(reservas.router)
 app.include_router(itinerarios.router)
 app.include_router(admin.router)
 app.include_router(avaliacoes.router)
+app.include_router(rfq.router)
+app.include_router(propostas.router)
+app.include_router(evento.router)
+app.include_router(pagamentos.router)
+app.include_router(eventos.router)
 
 
 @app.get("/")

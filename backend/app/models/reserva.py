@@ -18,6 +18,7 @@ class Reserva(Base):
     id = Column(Integer, primary_key=True, index=True)
     empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
     atividade_id = Column(Integer, ForeignKey("atividades.id"), nullable=False)
+    proposta_id = Column(Integer, ForeignKey("propostas.id"), nullable=True)  # Opcional, reserva pode vir de proposta
     data = Column(Date, nullable=False)
     n_pessoas = Column(Integer, nullable=False)
     preco_total = Column(Float, nullable=False)
@@ -27,4 +28,9 @@ class Reserva(Base):
     # Relacionamentos
     empresa = relationship("Empresa", back_populates="reservas")
     atividade = relationship("Atividade", back_populates="reservas")
+    proposta = relationship("Proposta", back_populates="reserva")
+    mensagens = relationship("Mensagem", back_populates="reserva", cascade="all, delete-orphan")
+    documentos = relationship("Documento", back_populates="reserva", cascade="all, delete-orphan")
+    notas = relationship("NotaEvento", back_populates="reserva", cascade="all, delete-orphan")
+    pagamento = relationship("Pagamento", back_populates="reserva", uselist=False, cascade="all, delete-orphan")
 

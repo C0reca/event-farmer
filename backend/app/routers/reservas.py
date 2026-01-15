@@ -1,18 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from app.database import get_db
-from app.core.dependencies import get_current_user
-from app.models.user import User
+from app.core.dependencies import get_current_user, get_current_user_required
+from app.core.security import get_password_hash
+from app.models.user import User, TipoUsuario
 from app.crud import reserva as crud_reserva, empresa as crud_empresa
-from app.schemas.reserva import ReservaCreate, ReservaResponse, ReservaCancel
+from app.schemas.reserva import ReservaCreate, ReservaGuestCreate, ReservaResponse, ReservaCancel
+from app.services.email import email_service
 
 router = APIRouter(prefix="/reservas", tags=["reservas"])
 
 
 @router.post("/", response_model=ReservaResponse)
-def create_reserva(reserva: ReservaCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Cria nova reserva"""
+def create_reserva(
+    reserva: ReservaCreate, 
+    current_user: User = Depends(get_current_user_required), 
+    db: Session = Depends(get_db)
+):
+    """Cria nova reserva (requer autenticação)"""
     if current_user.tipo.value != "empresa":
         raise HTTPException(status_code=403, detail="Only empresas can create reservas")
     
@@ -21,6 +27,90 @@ def create_reserva(reserva: ReservaCreate, current_user: User = Depends(get_curr
         raise HTTPException(status_code=404, detail="Empresa profile not found")
     
     db_reserva = crud_reserva.create_reserva(db, reserva, empresa.id)
+    if not db_reserva:
+        raise HTTPException(status_code=400, detail="Could not create reserva. Check capacidade and atividade exists.")
+    
+    # Adicionar info da atividade
+    atividade_info = {
+        "id": db_reserva.atividade.id,
+        "nome": db_reserva.atividade.nome,
+        "tipo": db_reserva.atividade.tipo,
+        "preco_por_pessoa": db_reserva.atividade.preco_por_pessoa
+    }
+    
+    reserva_dict = {
+        "id": db_reserva.id,
+        "empresa_id": db_reserva.empresa_id,
+        "atividade_id": db_reserva.atividade_id,
+        "data": db_reserva.data,
+        "n_pessoas": db_reserva.n_pessoas,
+        "preco_total": db_reserva.preco_total,
+        "estado": db_reserva.estado.value,
+        "atividade": atividade_info
+    }
+    
+    return reserva_dict
+
+
+@router.post("/guest", response_model=ReservaResponse)
+def create_reserva_guest(reserva_guest: ReservaGuestCreate, db: Session = Depends(get_db)):
+    """Cria reserva sem autenticação (guest) - cria empresa temporária se necessário"""
+    from app.models.empresa import Empresa
+    
+    # Verificar se já existe uma empresa guest com este email
+    # Buscar por user com este email e tipo empresa
+    user_guest = db.query(User).filter(
+        User.email == reserva_guest.email,
+        User.tipo == TipoUsuario.EMPRESA
+    ).first()
+    
+    if user_guest:
+        # Usar empresa existente
+        empresa = crud_empresa.get_empresa_by_user_id(db, user_guest.id)
+        if not empresa:
+            # Criar empresa se não existir
+            from app.schemas.empresa import EmpresaCreate
+            empresa_data = EmpresaCreate(
+                nome=reserva_guest.nome_empresa,
+                localizacao=reserva_guest.localizacao,
+                setor=None,
+                n_funcionarios=None,
+                orcamento_medio=None,
+                preferencia_atividades=None
+            )
+            empresa = crud_empresa.create_empresa(db, empresa_data, user_guest.id)
+    else:
+        # Criar user guest e empresa
+        user_guest = User(
+            nome=reserva_guest.nome_empresa,
+            email=reserva_guest.email,
+            password=get_password_hash("guest_temp_password"),  # Password temporário
+            tipo=TipoUsuario.EMPRESA
+        )
+        db.add(user_guest)
+        db.commit()
+        db.refresh(user_guest)
+        
+        # Criar empresa
+        from app.schemas.empresa import EmpresaCreate
+        empresa_data = EmpresaCreate(
+            nome=reserva_guest.nome_empresa,
+            localizacao=reserva_guest.localizacao,
+            setor=None,
+            n_funcionarios=None,
+            orcamento_medio=None,
+            preferencia_atividades=None
+        )
+        empresa = crud_empresa.create_empresa(db, empresa_data, user_guest.id)
+    
+    # Criar reserva
+    reserva_data = ReservaCreate(
+        atividade_id=reserva_guest.atividade_id,
+        data=reserva_guest.data,
+        n_pessoas=reserva_guest.n_pessoas
+    )
+    
+    db_reserva = crud_reserva.create_reserva(db, reserva_data, empresa.id)
     if not db_reserva:
         raise HTTPException(status_code=400, detail="Could not create reserva. Check capacidade and atividade exists.")
     
@@ -183,6 +273,22 @@ def aceitar_reserva(reserva_id: int, current_user: User = Depends(get_current_us
         "tipo": reserva.atividade.tipo,
         "preco_por_pessoa": reserva.atividade.preco_por_pessoa
     }
+    
+    # Notificar empresa que reserva foi confirmada
+    empresa = reserva.empresa
+    if empresa and empresa.user:
+        reserva_dict = {
+            "atividade_nome": reserva.atividade.nome,
+            "data": reserva.data.isoformat(),
+            "n_pessoas": reserva.n_pessoas,
+            "preco_total": reserva.preco_total
+        }
+        fornecedor_nome = reserva.atividade.fornecedor.nome if reserva.atividade.fornecedor else "Fornecedor"
+        email_service.send_reserva_confirmada_notification(
+            reserva_dict,
+            empresa.user.email,
+            fornecedor_nome
+        )
     
     return {
         "id": reserva.id,

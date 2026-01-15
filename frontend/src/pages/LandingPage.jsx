@@ -1,7 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import Input from '../components/ui/Input';
+import ActivityCard from '../components/ActivityCard';
+import ReservationFormGuest from '../components/ReservationFormGuest';
+import CriarEventoForm from '../components/CriarEventoForm';
+import { toast } from 'react-toastify';
 import { 
   CheckCircle2, 
   Users, 
@@ -20,15 +25,30 @@ import {
   X,
   MapPin,
   Clock,
-  Users as UsersIcon
+  Users as UsersIcon,
+  Search
 } from 'lucide-react';
 import api from '../services/api';
 
 function LandingPage() {
+  const navigate = useNavigate();
   const [destaques, setDestaques] = useState([]);
   const [fornecedores, setFornecedores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingFornecedores, setLoadingFornecedores] = useState(true);
+  
+  // Busca e reserva
+  const [buscaForm, setBuscaForm] = useState({
+    localizacao: '',
+    n_pessoas: '',
+    data: '',
+    categoria: ''
+  });
+  const [resultadosBusca, setResultadosBusca] = useState([]);
+  const [buscando, setBuscando] = useState(false);
+  const [atividadeSelecionada, setAtividadeSelecionada] = useState(null);
+  const [mostrarFormReserva, setMostrarFormReserva] = useState(false);
+  const [mostrarCriarEvento, setMostrarCriarEvento] = useState(false);
 
   useEffect(() => {
     const carregarDestaques = async () => {
@@ -143,6 +163,50 @@ function LandingPage() {
     carregarFornecedores();
   }, []);
 
+  const handleBuscarAtividades = async (e) => {
+    e.preventDefault();
+    setBuscando(true);
+    
+    try {
+      const params = new URLSearchParams();
+      if (buscaForm.localizacao) params.append('localizacao', buscaForm.localizacao);
+      if (buscaForm.n_pessoas) params.append('n_pessoas', buscaForm.n_pessoas);
+      if (buscaForm.data) params.append('data', buscaForm.data);
+      if (buscaForm.categoria) params.append('categoria', buscaForm.categoria);
+      
+      const response = await api.get(`/atividades/?${params.toString()}`);
+      setResultadosBusca(response.data || []);
+      
+      if (response.data && response.data.length > 0) {
+        document.getElementById('resultados-busca')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        toast.info('Nenhuma atividade encontrada. Tente outros critérios.');
+      }
+    } catch (error) {
+      console.error('Erro ao buscar atividades:', error);
+      toast.error('Erro ao buscar atividades. Tente novamente.');
+    } finally {
+      setBuscando(false);
+    }
+  };
+
+  const handleReservar = (atividade) => {
+    setAtividadeSelecionada(atividade);
+    setMostrarFormReserva(true);
+  };
+
+  const handleSubmitReserva = async (dadosReserva) => {
+    try {
+      const response = await api.post('/reservas/guest', dadosReserva);
+      toast.success('Reserva criada com sucesso! Verifique o seu email.');
+      setMostrarFormReserva(false);
+      setAtividadeSelecionada(null);
+      // Opcional: redirecionar para página de confirmação
+    } catch (error) {
+      toast.error('Erro ao criar reserva: ' + (error.response?.data?.detail || 'Tente novamente.'));
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white-soft">
       {/* 1. Hero Section - Gradiente #0E1424 → #1F4FFF */}
@@ -150,34 +214,80 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto container-padding py-24 md:py-32 lg:py-40">
           <div className="text-center max-w-4xl mx-auto text-white">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-              Eventos de equipa, sem stress.
+              Reserve o seu evento de equipa agora
             </h1>
             <p className="text-xl md:text-2xl mb-4 max-w-3xl mx-auto text-white">
-              Planeados, reservados e geridos num só lugar.
+              Encontre e reserve atividades em minutos, sem criar conta.
             </p>
             <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto text-white leading-relaxed">
-              A TeamSync ajuda empresas a descobrir, reservar e organizar experiências de equipa — de team buildings a offsites completos — com total controlo, zero fricção e fornecedores verificados.
+              Milhares de atividades verificadas. Reserve agora e pague depois. Sem complicações.
             </p>
+            
+            {/* Formulário de Busca Proeminente */}
+            <Card className="max-w-4xl mx-auto mb-8 bg-white/95 backdrop-blur-sm shadow-2xl">
+              <Card.Content className="p-6">
+                <form onSubmit={handleBuscarAtividades} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <Input
+                      label="Localização"
+                      type="text"
+                      value={buscaForm.localizacao}
+                      onChange={(e) => setBuscaForm({ ...buscaForm, localizacao: e.target.value })}
+                      placeholder="ex: Lisboa"
+                      className="bg-white"
+                    />
+                    <Input
+                      label="Nº Pessoas"
+                      type="number"
+                      min="1"
+                      value={buscaForm.n_pessoas}
+                      onChange={(e) => setBuscaForm({ ...buscaForm, n_pessoas: e.target.value })}
+                      placeholder="ex: 20"
+                      className="bg-white"
+                    />
+                    <Input
+                      label="Data"
+                      type="date"
+                      value={buscaForm.data}
+                      onChange={(e) => setBuscaForm({ ...buscaForm, data: e.target.value })}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="bg-white"
+                    />
+                    <div className="flex items-end">
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full h-[42px]"
+                        loading={buscando}
+                      >
+                        <Search className="mr-2 h-5 w-5" />
+                        Buscar
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </Card.Content>
+            </Card>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button
-                as={Link}
-                to="/register"
+                onClick={() => setMostrarCriarEvento(true)}
                 size="lg"
                 variant="primary"
                 className="px-8 bg-primary hover:bg-primary-600"
               >
-                Organizar evento
+                Criar Evento
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button
-                as={Link}
-                to="/contact"
+                onClick={() => {
+                  document.getElementById('experiencias-destaque')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 size="lg"
                 variant="outline"
                 className="px-8 border-2 border-white text-white hover:bg-white/10"
               >
-                Falar com a TeamSync
+                Ver Atividades em Destaque
               </Button>
             </div>
 
@@ -365,87 +475,25 @@ function LandingPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {destaques.map((atividade) => {
-                const imagens = atividade.imagens ? JSON.parse(atividade.imagens || '[]') : [];
-                const imagemUrl = imagens[0] || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=800';
-                
-                return (
-                  <Card key={atividade.id} hover={true} className="overflow-hidden p-0">
-                    <div className="relative h-48 bg-grey-200">
-                      <img 
-                        src={imagemUrl} 
-                        alt={atividade.nome}
-                        className="w-full h-full object-cover"
-                      />
-                      {atividade.categoria && (
-                        <div className="absolute top-3 left-3 bg-primary text-white px-3 py-1 rounded-lg text-xs font-semibold uppercase shadow-lg">
-                          {atividade.categoria}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-navy-900 mb-2 line-clamp-1">
-                        {atividade.nome}
-                      </h3>
-                      <p className="text-sm text-navy-700 mb-4 line-clamp-2 leading-relaxed">
-                        {atividade.descricao}
-                      </p>
-                      
-                      <div className="space-y-2 mb-4">
-                        {atividade.localizacao && (
-                          <div className="flex items-center gap-2 text-sm text-navy-600">
-                            <MapPin className="h-4 w-4 text-primary" />
-                            <span>{atividade.localizacao}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-4 text-sm text-navy-600">
-                          {atividade.duracao_minutos && (
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-4 w-4 text-primary" />
-                              <span>{atividade.duracao_minutos}min</span>
-                            </div>
-                          )}
-                          {atividade.capacidade_max && (
-                            <div className="flex items-center gap-1">
-                              <UsersIcon className="h-4 w-4 text-primary" />
-                              <span>até {atividade.capacidade_max}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center pt-4 border-t border-grey">
-                        <div>
-                          <span className="text-2xl font-bold text-primary">
-                            €{atividade.preco_por_pessoa?.toFixed(2) || '0.00'}
-                          </span>
-                          <span className="text-sm text-navy-600 ml-1">/pessoa</span>
-                        </div>
-                        <Button
-                          as={Link}
-                          to={`/atividade/${atividade.id}`}
-                          size="sm"
-                          variant="primary"
-                        >
-                          Ver detalhes
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })}
+              {destaques.map((atividade) => (
+                <ActivityCard
+                  key={atividade.id}
+                  atividade={atividade}
+                  onReserve={handleReservar}
+                />
+              ))}
             </div>
           )}
 
           <div className="text-center mt-12">
             <Button
               as={Link}
-              to="/register"
+              to="/dashboard"
               size="lg"
-              variant="primary"
+              variant="outline"
               className="px-8"
             >
-              Explorar todas as experiências
+              Ver Todas as Atividades
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -739,6 +787,57 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Modal de Criar Evento */}
+      {mostrarCriarEvento && (
+        <CriarEventoForm
+          onClose={() => setMostrarCriarEvento(false)}
+          onSubmit={async (dados) => {
+            try {
+              // Preparar dados para envio (garantir tipos corretos)
+              const dadosEnvio = {
+                ...dados,
+                n_pessoas: parseInt(dados.n_pessoas) || 0,
+                data_fim: dados.data_fim || null,
+                observacoes: dados.observacoes || null,
+                tipos_atividades: dados.tipos_atividades || []
+              };
+              
+              console.log('Enviando dados:', dadosEnvio); // Debug
+              
+              const response = await api.post('/eventos/criar', dadosEnvio);
+              setMostrarCriarEvento(false);
+              toast.success('Propostas geradas com sucesso!');
+              // Redirecionar para página de propostas com dados do evento
+              navigate('/propostas-evento', { 
+                state: { 
+                  propostas: response.data,
+                  eventoData: dadosEnvio // Passar dados do evento original
+                } 
+              });
+            } catch (error) {
+              console.error('Erro ao criar evento:', error.response?.data); // Debug
+              const errorMsg = error.response?.data?.detail || 
+                              (error.response?.data?.detail && Array.isArray(error.response.data.detail) 
+                                ? error.response.data.detail.map(e => e.msg || e.loc?.join('.')).join(', ')
+                                : 'Tente novamente.');
+              toast.error('Erro ao criar evento: ' + errorMsg);
+            }
+          }}
+        />
+      )}
+
+      {/* Modal de Reserva */}
+      {mostrarFormReserva && atividadeSelecionada && (
+        <ReservationFormGuest
+          atividade={atividadeSelecionada}
+          onClose={() => {
+            setMostrarFormReserva(false);
+            setAtividadeSelecionada(null);
+          }}
+          onSubmit={handleSubmitReserva}
+        />
+      )}
     </div>
   );
 }

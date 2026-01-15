@@ -6,6 +6,7 @@ import api from '../services/api';
 import AppLayout from '../components/layout/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import Loader from '../components/ui/Loader';
 
 function Reservas() {
   const { user, loading: authLoading } = useAuth();
@@ -67,8 +68,8 @@ function Reservas() {
     return (
       <AppLayout>
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          <p className="mt-4 text-secondary-600">A carregar...</p>
+          <Loader size="lg" />
+          <p className="mt-4 text-navy-600">A carregar...</p>
         </div>
       </AppLayout>
     );
@@ -162,16 +163,26 @@ function Reservas() {
                         </span>
                       </div>
                     )}
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        as={Link}
+                        to={`/evento/${reserva.id}`}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Ver Evento
+                      </Button>
+                      {reserva.estado === 'pendente' && (
+                        <Button
+                          onClick={() => handleCancel(reserva.id)}
+                          variant="danger"
+                          size="sm"
+                        >
+                          Cancelar
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  {reserva.estado === 'pendente' && (
-                    <Button
-                      onClick={() => handleCancel(reserva.id)}
-                      variant="danger"
-                      size="sm"
-                    >
-                      Cancelar
-                    </Button>
-                  )}
                 </div>
               </Card>
             );

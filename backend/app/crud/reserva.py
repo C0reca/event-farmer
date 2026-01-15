@@ -16,22 +16,37 @@ def get_reservas_by_empresa(db: Session, empresa_id: int):
     return db.query(Reserva).filter(Reserva.empresa_id == empresa_id).all()
 
 
-def create_reserva(db: Session, reserva: ReservaCreate, empresa_id: int) -> Optional[Reserva]:
+def create_reserva(
+    db: Session,
+    reserva: ReservaCreate,
+    empresa_id: int,
+    preco_total: Optional[float] = None,
+    proposta_id: Optional[int] = None
+) -> Optional[Reserva]:
     """Cria nova reserva"""
-    # Buscar atividade para calcular preço total
-    atividade = db.query(Atividade).filter(Atividade.id == reserva.atividade_id).first()
-    if not atividade:
-        return None
-    
-    # Verificar capacidade
-    if atividade.capacidade_max < reserva.n_pessoas:
-        return None
-    
-    preco_total = atividade.preco_por_pessoa * reserva.n_pessoas
+    # Se atividade_id não for fornecido, pode ser uma reserva sem atividade específica (de proposta personalizada)
+    if reserva.atividade_id:
+        atividade = db.query(Atividade).filter(Atividade.id == reserva.atividade_id).first()
+        if not atividade:
+            return None
+        
+        # Verificar capacidade
+        if atividade.capacidade_max < reserva.n_pessoas:
+            return None
+        
+        # Calcular preço se não fornecido
+        if preco_total is None:
+            preco_total = atividade.preco_por_pessoa * reserva.n_pessoas
+    else:
+        # Reserva sem atividade específica (proposta personalizada)
+        if preco_total is None:
+            return None  # Preço deve ser fornecido
+        atividade = None
     
     db_reserva = Reserva(
         empresa_id=empresa_id,
         atividade_id=reserva.atividade_id,
+        proposta_id=proposta_id,
         data=reserva.data,
         n_pessoas=reserva.n_pessoas,
         preco_total=preco_total,

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useAuth } from '../hooks/useAuth';
 import api from '../services/api';
@@ -9,6 +9,7 @@ import AppLayout from '../components/layout/AppLayout';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
+import Loader from '../components/ui/Loader';
 
 function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -109,8 +110,8 @@ function Dashboard() {
     return (
       <AppLayout>
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          <p className="mt-4 text-secondary-600">A carregar...</p>
+          <Loader size="lg" />
+          <p className="mt-4 text-navy-600">A carregar...</p>
         </div>
       </AppLayout>
     );
@@ -121,6 +122,26 @@ function Dashboard() {
       title="Dashboard"
       description="Encontre e reserve as melhores atividades de team building para sua empresa"
     >
+      {/* Quick Actions */}
+      <div className="mb-6 flex flex-wrap gap-3">
+        <Button
+          as={Link}
+          to="/rfqs"
+          variant="primary"
+          size="lg"
+        >
+          📋 Criar Pedido de Proposta (RFQ)
+        </Button>
+        <Button
+          as={Link}
+          to="/rfqs"
+          variant="outline"
+          size="lg"
+        >
+          Ver Meus RFQs
+        </Button>
+      </div>
+
       {/* Formulário de Busca com Filtros Avançados */}
       <Card className="mb-8" hover={false}>
         <Card.Header>
@@ -207,8 +228,16 @@ function Dashboard() {
         </Card.Content>
       </Card>
 
+      {/* Loading State */}
+      {loading && (
+        <div className="text-center py-12">
+          <Loader size="lg" />
+          <p className="mt-4 text-navy-600">A procurar atividades...</p>
+        </div>
+      )}
+
       {/* Lista de Atividades */}
-      {atividades.length > 0 && (
+      {!loading && atividades.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-secondary-900">
@@ -230,7 +259,7 @@ function Dashboard() {
         </div>
       )}
 
-      {atividades.length === 0 && !loading && (
+      {!loading && atividades.length === 0 && (
         <Card className="text-center py-12">
           <div className="max-w-md mx-auto">
             <svg

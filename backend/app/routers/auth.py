@@ -4,7 +4,7 @@ from datetime import timedelta
 from app.database import get_db
 from app.core.security import create_access_token
 from app.core.config import settings
-from app.core.dependencies import get_current_user
+from app.core.dependencies import get_current_user, get_current_user_required
 from app.models.user import User
 from app.crud import user as crud_user, empresa as crud_empresa, fornecedor as crud_fornecedor
 from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
@@ -48,7 +48,7 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
 
 
 @router.get("/me", response_model=UserResponse)
-def get_current_user_info(current_user: User = Depends(get_current_user)):
+def get_current_user_info(current_user: User = Depends(get_current_user_required)):
     """Obtém informação do utilizador autenticado"""
     return current_user
 

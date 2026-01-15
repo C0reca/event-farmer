@@ -55,4 +55,6 @@ class RecomendacaoParams(BaseModel):
     categoria: Optional[str] = None  # aventura, relax, etc.
     clima: Optional[str] = None  # indoor, outdoor, ambos
     duracao_max: Optional[int] = None  # Duração máxima em minutos
+    objetivo: Optional[str] = None  # bonding, onboarding, celebração, formação, etc.
+    preferencias: Optional[str] = None  # Preferências e restrições em texto livre
 

@@ -50,4 +50,5 @@ class Atividade(Base):
     fornecedor = relationship("Fornecedor", back_populates="atividades")
     reservas = relationship("Reserva", back_populates="atividade")
     avaliacoes = relationship("Avaliacao", back_populates="atividade")
+    propostas = relationship("Proposta", back_populates="atividade")
 
