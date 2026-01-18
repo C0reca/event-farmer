@@ -91,3 +91,34 @@
   }
 }
 
+<<<<<<< HEAD
+/* Leaflet Map Styling */
+.leaflet-container-custom {
+  font-family: inherit;
+}
+
+.leaflet-container {
+  background: #f8fafc;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-content {
+  margin: 0;
+  padding: 0;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+/* Custom marker styling */
+.custom-marker {
+  background: transparent !important;
+  border: none !important;
+}
+=======
+>>>>>>> parent of 720baa7 (c)

@@ -72,9 +72,7 @@ Após iniciar a aplicação, você pode:
 - O backend cria dados mock na primeira execução
 - Para produção, altere as credenciais e SECRET_KEY
 
-## 📚 Documentação
-
-Para entender o estado atual completo do projeto, funcionalidades implementadas, arquitetura e próximos passos, consulte:
+## 📚 DocumentaçãoPara entender o estado atual completo do projeto, funcionalidades implementadas, arquitetura e próximos passos, consulte:
 
 - **[ESTADO_PROJETO.md](./ESTADO_PROJETO.md)** - Estado atual completo do projeto (RECOMENDADO para novos desenvolvedores)
 - [VISAO_PRODUTO.md](./VISAO_PRODUTO.md) - Visão de produto e MVP scope
